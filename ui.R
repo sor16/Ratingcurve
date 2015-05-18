@@ -9,7 +9,7 @@ library(shiny)
 
 shinyUI(pageWithSidebar(
   
-  # Application title
+  # Applicatio
   headerPanel("Old Faithful Geyser Data"),
   
   # Sidebar with a slider input for number of bins
