@@ -17,48 +17,53 @@ shinyServer(function(input, output) {
         ydif=qvdata$Qlog-ybar
         Sxy=sum(xdif*ydif)
         Sxx=sum(xdif*xdif)
-        qvdata$b=Sxy/Sxx
-        qvdata$a=ybar-qvdata$b*xbar
+        b=Sxy/Sxx
+        a=ybar-b*xbar
         qvdata$fit=a+b*qvdata$Hlog
         
-        xbar2=mean(qvdata$H)
-        ybar2=mean(qvdata$Q)
-        xdif2=qvdata$H-xbar2
-        ydif2=qvdata$Q-ybar2
-        Sxy2=sum(xdif2*ydif2)
-        Sxx2=sum(xdif2*xdif2)
-        qvdata$b2=Sxy2/Sxx2
-        qvdata$a2=ybar2-qvdata$b2*xbar2
-        qvdata$fit2=a2+b2*qvdata$H
-        qvdata
+        #xbar2=mean(qvdata$H)
+        #ybar2=mean(qvdata$Q)
+        #xdif2=qvdata$H-xbar2
+        #ydif2=qvdata$Q-ybar2
+        #Sxy2=sum(xdif2*ydif2)
+        #Sxx2=sum(xdif2*xdif2)
+        #b2=Sxy2/Sxx2
+        #a2=ybar2-b2*xbar2
+        #qvdata$fit2=a2+b2*qvdata$H
+        return(list("qvdata"=qvdata,"a"=a,"b"=b))
     })
     
     
   output$contents <- renderPlot({
-    qvdata=data()
-         if(!is.null(qvdata)) {
+    plotlist=data()
+         if(!is.null(plotlist$qvdata)) {
             t=seq(0,2,0.01)
-            abline=qvdata$a+qvdata$b*t
-            abline2=qvdata$a2+qvdata$b2*exp(t)
+            #t2=seq(0,7.4,0.01)
+            a=plotlist$a
+            b=plotlist$b
+            abline=a+b*t
+            #a2=plotlist$a2
+            #b2=plotlist$b2
+            #abline2=a2+b2*t2
           
             if(input$skali=='log' && input$model =='lik2'){
-                  ggplot(qvdata,aes(Hlog,Qlog))+geom_point(col="red")+theme_bw()+geom_abline(intercept=a,slope=b)+
+                  ggplot(plotlist$qvdata,aes(Hlog,Qlog))+geom_point(col="red")+theme_bw()+geom_abline(intercept=a,slope=b)+
                   ggtitle("Water level (h) vs Discharge(Q) Log Scale")+xlab("log(H)")+ylab("log(Q)")
               
             }
             else if (input$skali=='log' && input$model =='lik1'){
-                  plot(qvdata$Hlog,qvdata$Qlog,type="p",pch=20,col="red",xlab="Hlog",ylab="Qlog",main="Water level (h) vs Discharge(Q) Log Scale")
+                  with(plotlist$qvdata,plot(Hlog,Qlog,type="p",pch=20,col="red",xlab="Hlog",ylab="Qlog",main="Water level (h) vs Discharge(Q) Log Scale"))
                   lines(t,abline,col="black")
             }
             else if (input$model =='lik2'){
                   curve=data.frame(x=seq(0,1.2,0.01))
                   curve$fit=a+b*curve$x
                   curve=exp(curve)
-                  ggplot(qvdata,aes(H,Q))+geom_point()+theme_bw()+stat_smooth(mapping=aes(x,fit),data=curve)+
+                  ggplot(plotlist$qvdata,aes(H,Q))+geom_point()+theme_bw()+stat_smooth(mapping=aes(x,fit),data=curve)+
                   ggtitle("Water level (h) vs Discharge(Q) Log Scale")
             }
             else{
-                  plot(qvdata$H,qvdata$Q,type="p",pch=20,col="black",xlab="h",ylab="Q",main="Water level (h) vs Discharge(Q) real scale") 
+                  with(plotlist$qvdata,plot(H,Q,type="p",pch=20,col="black",xlab="h",ylab="Q",main="Water level (h) vs Discharge(Q) real scale")) 
                   lines(exp(t),exp(abline),col="blue")
             }
         } 
@@ -67,24 +72,24 @@ shinyServer(function(input, output) {
   })
   
 output$residual<- renderPlot({
-      qvdata=data()
-      if(!is.null(qvdata)) {
+      plotlist=data()
+      if(!is.null(plotlist$qvdata)) {
           if(input$checkbox==TRUE){
               
               if(input$skali=='log' && input$model =='lik1'){
-                  plot(qvdata$Hlog,qvdata$Qlog-qvdata$fit,pch=20,col="red",main="Residuals",ylab=expression(epsilon[i]),xlab="log(H)")
-                  lines(qvdata$Hlog,rep(0,nrow(qvdata)),col="black")
+                  with(plotlist$qvdata, plot(Hlog,Qlog-fit,pch=20,col="red",main="Residuals",ylab=expression(epsilon[i]),xlab="log(H)"))
+                  with(plotlist$qvdata,lines(Hlog,rep(0,nrow(qvdata)),col="black"))
               }
               else if(input$skali=='log' && input$model =='lik2'){
-                  ggplot(qvdata,aes(Hlog,Qlog-fit))+geom_point(col="red")+theme_bw()+geom_abline(intercept=0,slope=0)+ggtitle("Residuals")+
+                  ggplot(plotlist$qvdata,aes(Hlog,Qlog-fit))+geom_point(col="red")+theme_bw()+geom_abline(intercept=0,slope=0)+ggtitle("Residuals")+
                       xlab("log(H)")+ylab(expression(epsilon[i]))
               }
               else if(input$skali=='raun' && input$model =='lik1'){
-                  plot(qvdata$H,qvdata$Q-qvdata$fit2,pch=20,col="red",main="Residuals",ylab=expression(epsilon[i]),xlab="H")
-                  lines(qvdata$H,rep(0,nrow(qvdata)),col="black")
+                  with(plotlist$qvdata, plot(H,Q-exp(fit),pch=20,col="red",main="Residuals",ylab=expression(epsilon[i]),xlab="H"))
+                  with(plotlist$qvdata,lines(H,rep(0,nrow(qvdata)),col="black"))
               }
               else{
-                  ggplot(qvdata,aes(H,Q-fit2))+geom_point(col="red")+theme_bw()+geom_abline(intercept=0,slope=0)+ggtitle("Residuals")+
+                  ggplot(plotlist$qvdata,aes(H,Q-exp(fit)))+geom_point(col="red")+theme_bw()+geom_abline(intercept=0,slope=0)+ggtitle("Residuals")+
                       xlab("H")+ylab(expression(epsilon[i]))
               }
           }
