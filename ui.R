@@ -1,28 +1,27 @@
-
-# This is the user-interface definition of a Shiny web application.
-# You can find out more about building applications with Shiny here:
-# 
-# http://www.rstudio.com/shiny/
-#
-
 library(shiny)
+library(ggplot2)
+        Sys.setlocale("LC_ALL", "is_IS")
 
-shinyUI(pageWithSidebar(
-  
-  # Applicatio
-  headerPanel("Old Faithful Geyser Data"),
-  
-  # Sidebar with a slider input for number of bins
-  sidebarPanel(
-    sliderInput("bins",
-                "Number of bins:",
-                min = 1,
-                max = 50,
-                value = 30)
-  ),
-  
-  # Show a plot of the generated distribution
-  mainPanel(
-    plotOutput("distPlot")
-  )
-))
+        shinyUI(fluidPage(
+            titlePanel('Línulegt aðhvarf'),
+            sidebarLayout(
+                sidebarPanel(
+                    fileInput('file1', 'Veldu gögn'),
+                    #tags$hr(),
+        
+                    radioButtons('skali', 'Skali',
+                                 c(Lograskali="log",
+                                   Raunskali="raun")),
+                    radioButtons('model', 'Líkan',
+                                 c(Líkan1="lik1",
+                                   Líkan2="lik2")),
+                    checkboxInput("checkbox", label = "Leifarit", value = FALSE)
+                    
+                ),
+                mainPanel(
+                    plotOutput('contents'),
+                    plotOutput('residual')
+                    
+                )
+            )
+        ))
