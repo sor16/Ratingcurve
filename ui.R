@@ -15,7 +15,9 @@ library(ggplot2)
                     radioButtons('model', 'Líkan',
                                  c(Líkan1="lik1",
                                    Líkan2="lik2")),
-                    checkboxInput("checkbox", label = "Leifarit", value = FALSE)
+                    checkboxInput("checkbox", label = "Leifarit", value = FALSE),
+                    radioButtons('format','Document format',c('PDF','HTML','Word'),inline=TRUE),
+                    downloadButton('downloadReport')
                     
                 ),
                 mainPanel(

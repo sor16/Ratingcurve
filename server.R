@@ -78,7 +78,7 @@ output$residual<- renderPlot({
               
               if(input$skali=='log' && input$model =='lik1'){
                   with(plotlist$qvdata, plot(Hlog,Qlog-fit,pch=20,col="red",main="Residuals",ylab=expression(epsilon[i]),xlab="log(H)"))
-                  with(plotlist$qvdata,lines(Hlog,rep(0,nrow(qvdata)),col="black"))
+                  with(plotlist$qvdata,lines(Hlog,rep(0,nrow(plotlist$qvdata)),col="black"))
               }
               else if(input$skali=='log' && input$model =='lik2'){
                   ggplot(plotlist$qvdata,aes(Hlog,Qlog-fit))+geom_point(col="red")+theme_bw()+geom_abline(intercept=0,slope=0)+ggtitle("Residuals")+
@@ -86,7 +86,7 @@ output$residual<- renderPlot({
               }
               else if(input$skali=='raun' && input$model =='lik1'){
                   with(plotlist$qvdata, plot(H,Q-exp(fit),pch=20,col="red",main="Residuals",ylab=expression(epsilon[i]),xlab="H"))
-                  with(plotlist$qvdata,lines(H,rep(0,nrow(qvdata)),col="black"))
+                  with(plotlist$qvdata,lines(H,rep(0,nrow(plotlist$qvdata)),col="black"))
               }
               else{
                   ggplot(plotlist$qvdata,aes(H,Q-exp(fit)))+geom_point(col="red")+theme_bw()+geom_abline(intercept=0,slope=0)+ggtitle("Residuals")+
@@ -95,5 +95,29 @@ output$residual<- renderPlot({
           }
       }
   })
+    output$downloadReport <- downloadHandler(
+        filename = function() {
+            paste('my-report', sep = '.', switch(
+                input$format, PDF = 'pdf', HTML = 'html', Word = 'docx'
+            ))
+        },
+        
+        content = function(file) {
+            src <- normalizePath('myreport.Rmd')
+            
+            # temporarily switch to the temp dir, in case you do not have write
+            # permission to the current working directory
+            owd <- setwd(tempdir())
+            on.exit(setwd(owd))
+            file.copy(src, 'myreport.Rmd')
+            
+            library(rmarkdown)
+            out <- render('myreport.Rmd', switch(
+                input$format,
+                PDF = pdf_document(), HTML = html_document(), Word = word_document()
+            ))
+            file.rename(out, file)
+        }
+    )
   
 })
