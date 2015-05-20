@@ -16,6 +16,7 @@ library(ggplot2)
                                  c(Líkan1="lik1",
                                    Líkan2="lik2")),
                     checkboxInput("checkbox", label = "Leifarit", value = FALSE),
+                    textInput("nafn","Nafn á skjali"),
                     radioButtons('format','Document format',c('PDF','HTML','Word'),inline=TRUE),
                     downloadButton('downloadReport')
                     
