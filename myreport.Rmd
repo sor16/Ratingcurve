@@ -10,25 +10,13 @@ This is an R Markdown document. Markdown is a simple formatting syntax for autho
 When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
 
 ```{r}
-plotlist=data()
-  if(!is.null(plotlist$qvdata)) {
-            t=plotlist$t
-            a=plotlist$a
-            b=plotlist$b
-            abline=a+b*t
-          
-            if(input$skali=='log' && input$model =='lik2'){
-                  ggplot(plotlist$qvdata,aes(Qlog,Hlog))+geom_point(col="red")+theme_bw()+geom_abline(intercept=a,slope=b)+
-                  ggtitle("Water level (h) vs Discharge(Q) Log Scale")+ylab("log(H)")+xlab("log(Q)")
-              
-            }
-            }
+plotratingcurve()
 ```
 
 You can also embed plots, for example:
 
-```{r, echo=FALSE}
-
+```{r}
+plotresidual()
 ```
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
