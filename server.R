@@ -7,10 +7,31 @@ shinyServer(function(input, output) {
         if (is.null(inFile)){
             return(NULL)
         }
-        qvdata=read.table(inFile$datapath)
-        names(qvdata)=c("H","Q")
-        qvdata$Hlog=log(qvdata[,1])
-        qvdata$Qlog=log(qvdata[,2])
+        output$text<-renderPrint({
+            inFile$type
+        })
+        if (inFile$type =="text/plain"){
+            qvdata=read.table(inFile$datapath,skip=3,sep="|")
+            qvdata=qvdata[,c(2:4,7)]
+            qvdata=data.frame(lapply(qvdata, as.character), stringsAsFactors=FALSE)
+            qvdata[,3:4]=apply(qvdata[,c(3,4)],2, function(x) as.numeric(gsub(",",".",x)))
+            names(qvdata)=c("Date","Time","H","Q")
+        }
+        else if(inFile$type=="text/csv"){
+            qvdata=read.table(inFile$datapath,skip=16)
+            qvdata=qvdata[,c(1:3,6)]
+            qvdata=data.frame(lapply(qvdata, as.character), stringsAsFactors=FALSE)
+            qvdata[,3:4]=apply(qvdata[,c(3,4)],2, function(x) as.numeric(gsub(",",".",x)))
+            names(qvdata)=c("Date","Time","H","Q")
+            
+        }
+        else {
+            qvdata=read.table(inFile$datapath)
+            names(qvdata)=c("H","Q")
+        }
+        
+        qvdata$Hlog=log(qvdata$H)
+        qvdata$Qlog=log(qvdata$Q)
         ybar=mean(qvdata$Hlog)
         xbar=mean(qvdata$Qlog)
         ydif=qvdata$Hlog-ybar
