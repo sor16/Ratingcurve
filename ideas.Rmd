@@ -21,7 +21,7 @@ Hugmyndir í Shiny:
     + formulas and connection to tex
     + put R variables in rmarkdown text
     + LEARN HOW TO USE RMARKDOWN
-    
+    + Frekar nett
    
 
 ```{r}
