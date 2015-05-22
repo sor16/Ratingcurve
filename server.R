@@ -10,6 +10,7 @@ shinyServer(function(input, output) {
         output$text<-renderPrint({
             inFile$type
         })
+        
         if (inFile$type =="text/plain"){
             qvdata=read.table(inFile$datapath,skip=3,sep="|")
             qvdata=qvdata[,c(2:4,7)]
@@ -95,6 +96,9 @@ plotresidual<- reactive({
   })
 output$contents<-renderPlot({
     plotratingcurve()    
+})
+output$table <- renderTable({
+    data()$qvdata
 })
 output$residual=renderPlot({
     plotresidual()

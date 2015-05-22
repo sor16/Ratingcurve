@@ -20,7 +20,8 @@ library(ggplot2)
                 mainPanel(
                     textOutput('text'),
                     plotOutput('contents'),
-                    plotOutput('residual')
+                    plotOutput('residual'),
+                    tableOutput('table')
                     
                     
                 )
