@@ -3,17 +3,16 @@ library(ggplot2)
         Sys.setlocale("LC_ALL", "is_IS")
 
         shinyUI(fluidPage(
-            titlePanel('Línulegt aðhvarf'),
+            titlePanel('Linear Regression'),
             sidebarLayout(
                 sidebarPanel(
-                    fileInput('file1', 'Veldu gögn'),
-                    #tags$hr(),
+                    fileInput('file1', 'Choose file'),
         
                     radioButtons('skali', 'Skali',
                                  c(Lograskali="log",
                                    Raunskali="raun")),
                     checkboxInput("checkbox", label = "Leifarit", value = FALSE),
-                    textInput("nafn","Nafn á skjali"),
+                    textInput("nafn","Name of river"),
                     radioButtons('format','Document format',c('PDF','HTML','Word'),inline=TRUE),
                     downloadButton('downloadReport')
                     

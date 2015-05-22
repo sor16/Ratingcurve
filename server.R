@@ -103,7 +103,7 @@ output$residual=renderPlot({
 
     output$downloadReport <- downloadHandler(
         filename = function() {
-            paste(input$nafn, format(Sys.Date(),"%d-%m-%Y"), sep=".", switch(
+            paste(input$file1$name, sep=".", switch(
                 input$format, PDF = 'pdf', HTML = 'html', Word = 'docx'
             ))
         },
