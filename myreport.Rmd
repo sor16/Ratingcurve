@@ -25,11 +25,11 @@ Note that the `echo = FALSE` parameter was added to the code chunk to prevent pr
 library(stargazer)
 ```  
 
-```{r results='asis'}
+```{r results='asis',echo=FALSE}
 qvdata=data()$qvdata
-
-renderTable({
-  head(qvdata)
-})
-stargazer(qvdata,type=switch(input$format,HTML="html",PDF="latex",Word="html"))
+if(input$format=="HTML"){
+    kable(qvdata)
+}
+else if(input$format=="PDF")
+stargazer(qvdata,type="latex")
 ```

@@ -35,12 +35,5 @@ Hugmyndir í Shiny:
     + skoda koda og skilja
 * Bayes
     + Multivariate normal model
-    + Large sampling size and normal models
-    
+    + Large sampling size and normal models?
 
-```{r, results='asis', echo=FALSE}
-library(knitr)
-data(mtcars)
-names(mtcars)[1]=c(expression(theta))
-print(kable(mtcars,col.names=c(expression(pi),names(mtcars[2:ncol(mtcars)]))))
-```
