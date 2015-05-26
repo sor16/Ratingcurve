@@ -21,3 +21,15 @@ plotresidual()
 ```
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+```{r echo=FALSE}
+library(stargazer)
+```  
+
+```{r results='asis'}
+qvdata=data()$qvdata
+
+renderTable({
+  head(qvdata)
+})
+stargazer(qvdata,type=switch(input$format,HTML="html",PDF="latex",Word="html"))
+```

@@ -1,6 +1,6 @@
 ---
 title: "Future ideas"
-author: "Sölvi Rögnvaldsson and Axel Örn Jansson"
+author: "Solvi Rognvaldsson and Axel Orn Jansson"
 date: "22 May 2015"
 output: html_document
 ---
@@ -22,14 +22,25 @@ Hugmyndir í Shiny:
     + put R variables in rmarkdown text
     + LEARN HOW TO USE RMARKDOWN
     + Frekar nett
-   
+    + xtable
+* Videos
+    + Dynamic Dashboards with Shiny [here](http://www.rstudio.com/resources/webinars/)
+    + Creating JavaScript data visualizations in R [here](http://www.rstudio.com/resources/webinars/)
+##Verkefni framundan
 
-```{r}
+* MATLAB
+    + stat toolbox og optimization toolbox
+    + Keyra modelid i gegn og lata thad virka
+    + finna R equivalent vid toolbox foll
+    + skoda koda og skilja
+* Bayes
+    + Multivariate normal model
+    + Large sampling size and normal models
+    
 
+```{r, results='asis', echo=FALSE}
+library(knitr)
+data(mtcars)
+names(mtcars)[1]=c(expression(theta))
+print(kable(mtcars,col.names=c(expression(pi),names(mtcars[2:ncol(mtcars)]))))
 ```
-
-
-```{r, echo=FALSE}
-
-```
-
