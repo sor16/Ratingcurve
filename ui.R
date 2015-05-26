@@ -17,6 +17,7 @@ library(ggplot2)
                     downloadButton('downloadReport')
                     
                 ),
+                #list of outputs
                 mainPanel(
                     textOutput('text'),
                     plotOutput('contents'),
