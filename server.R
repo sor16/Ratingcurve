@@ -1,15 +1,15 @@
 library(shiny)
 library(ggplot2)
 shinyServer(function(input, output) {
-    data<-reactive({
+    data<-eventReactive(input$go,{
         inFile <- input$file1
    
         if (is.null(inFile)){
             return(NULL)
         }
-        output$text<-renderPrint({
-            inFile$type
-        })
+        #output$text<-renderPrint({
+        #    inFile$type
+        #})
         
         if (inFile$type =="text/plain"){
             qvdata=read.table(inFile$datapath,skip=3,sep="|")
@@ -46,63 +46,87 @@ shinyServer(function(input, output) {
         t=seq(0,max(qvdata$Qlog)+1,0.01)
         return(list("qvdata"=qvdata,"a"=a,"b"=b,"t"=t))
     })
+    output$text<-renderPrint({input$checkbox})
     
-    
-plotratingcurve <- reactive({
+plotratingcurve <- eventReactive(input$go,{
     plotlist=data()
+    rclog=NULL
+    rcraun=NULL
+    rcleiflog=NULL
+    rcleifraun=NULL
          if(!is.null(plotlist$qvdata)) {
             t=plotlist$t
             a=plotlist$a
             b=plotlist$b
             abline=a+b*t
-          
-            if(input$skali=='log'){
-                  ratingcurve=ggplot(plotlist$qvdata,aes(Qlog,Hlog))+geom_point(col="red")+theme_bw()+geom_abline(intercept=a,slope=b)+
+            
+            if ("raun" %in% input$checkbox){
+                curve=data.frame(x=seq(0,max(plotlist$qvdata$Qlog),0.01))
+                curve$fit=a+b*curve$x
+                curve=exp(curve)
+                rcraun=ggplot(plotlist$qvdata,aes(Q,H))+geom_point()+theme_bw()+stat_smooth(mapping=aes(x,fit),data=curve)+
+                    ggtitle("Water level (h) vs Discharge(Q) Log Scale")
+            }
+            if("log" %in% input$checkbox){
+                  rclog=ggplot(plotlist$qvdata,aes(Qlog,Hlog))+geom_point(col="red")+theme_bw()+geom_abline(intercept=a,slope=b)+
                   ggtitle("Water level (h) vs Discharge(Q) Log Scale")+ylab("log(H)")+xlab("log(Q)")
               
             }
-            
-            else {
-                  curve=data.frame(x=seq(0,max(plotlist$qvdata$Qlog),0.01))
-                  curve$fit=a+b*curve$x
-                  curve=exp(curve)
-                  ratingcurve=ggplot(plotlist$qvdata,aes(Q,H))+geom_point()+theme_bw()+stat_smooth(mapping=aes(x,fit),data=curve)+
-                  ggtitle("Water level (h) vs Discharge(Q) Log Scale")
+            if("leiflog" %in% input$checkbox){
+                                 rcleiflog=ggplot(plotlist$qvdata,aes(Qlog,Hlog-fit))+geom_point(col="red")+theme_bw()+geom_abline(intercept=0,slope=0)+ggtitle("Residuals")+
+                                      xlab("log(Q)")+ylab(expression(epsilon[i]))
             }
-            return(ratingcurve)
+            
+            if ("leifraun" %in% input$checkbox){
+            rcleifraun=ggplot(plotlist$qvdata,aes(Q,H-exp(fit)))+geom_point(col="red")+theme_bw()+geom_abline(intercept=0,slope=0)+ggtitle("Residuals")+
+                                      xlab("Q")+ylab(expression(epsilon[i]))
+            }
+            return(list("rclog"=rclog,"rcraun"=rcraun, "rcleifraun"=rcleifraun,"rcleiflog"=rcleiflog))
         } 
-     
+    
      
   })
+
   
-plotresidual<- reactive({
-      plotlist=data()
-      t=plotlist$t
-      if(!is.null(plotlist$qvdata)) {
-          if(input$checkbox==TRUE){
-              
-              if(input$skali=='log' ){
-                  residual=ggplot(plotlist$qvdata,aes(Qlog,Hlog-fit))+geom_point(col="red")+theme_bw()+geom_abline(intercept=0,slope=0)+ggtitle("Residuals")+
-                      xlab("log(Q)")+ylab(expression(epsilon[i]))
-              }
-              else {
-                  residual=ggplot(plotlist$qvdata,aes(Q,H-exp(fit)))+geom_point(col="red")+theme_bw()+geom_abline(intercept=0,slope=0)+ggtitle("Residuals")+
-                      xlab("Q")+ylab(expression(epsilon[i]))
-              }
-              return(residual)
-          }   
-      }
-      
-  })
-output$contents<-renderPlot({
-    plotratingcurve()    
+# plotresidual<- reactive({
+#       plotlist=data()
+#       t=plotlist$t
+#       if(!is.null(plotlist$qvdata)) {
+#           if(input$checkbox==TRUE){
+#               
+#               if(input$skali=='log' ){
+#                   residual=ggplot(plotlist$qvdata,aes(Qlog,Hlog-fit))+geom_point(col="red")+theme_bw()+geom_abline(intercept=0,slope=0)+ggtitle("Residuals")+
+#                       xlab("log(Q)")+ylab(expression(epsilon[i]))
+#               }
+#               else {
+#                   residual=ggplot(plotlist$qvdata,aes(Q,H-exp(fit)))+geom_point(col="red")+theme_bw()+geom_abline(intercept=0,slope=0)+ggtitle("Residuals")+
+#                       xlab("Q")+ylab(expression(epsilon[i]))
+#               }
+#               return(residual)
+#           }   
+#       }
+#       
+#   })
+output$plotraun<-renderPlot({
+    if(!is.null(plotratingcurve()$rcraun))
+        plotratingcurve()$rcraun     
+})
+output$plotlog<-renderPlot({
+    if(!is.null(plotratingcurve()$rclog))
+    plotratingcurve()$rclog    
+})
+output$plotleifraun<-renderPlot({
+    if(!is.null(plotratingcurve()$rcleifraun))
+        plotratingcurve()$rcleifraun       
+})
+output$plotleiflog<-renderPlot({
+    if(!is.null(plotratingcurve()$rcleiflog))
+        plotratingcurve()$rcleiflog     
 })
 output$table <- renderTable({
+    
+    if(input$checkbox5==TRUE)
     data()$qvdata
-})
-output$residual=renderPlot({
-    plotresidual()
-
 })
 
     output$downloadReport <- downloadHandler(
